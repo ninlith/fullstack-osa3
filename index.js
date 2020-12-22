@@ -1,29 +1,10 @@
-/*
-npm init
-npm install express
-npm install --save-dev nodemon
-npm install morgan
-npm install cors
-npm install mongoose
-npm install dotenv
-
-package.json:
-  // ...
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    // ...
-
-//npm start
-npm run dev
-*/
-
 require('dotenv').config()
 const express = require('express')
 const app = express()
 const Person = require('./models/person')
 
 app.use(express.json())
+
 
 // middleware
 var morgan = require('morgan')
@@ -33,6 +14,7 @@ const cors = require('cors')
 app.use(cors())
 
 app.use(express.static('build'))
+
 
 let persons = [
       { 
@@ -76,23 +58,13 @@ app.get('/api/persons/:id', (request, response) => {
       response.status(404).end()
     }
   })
-/*  
-  const id = Number(request.params.id)
-  const person = persons.find(person => person.id === id)
-
-  if (person) {
-      response.json(person)
-  } else {
-      response.status(404).end()
-  }
-*/
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  persons = persons.filter(person => person.id !== id)
-
-  response.status(204).end()
+  Person.findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
 })
 
 const generateId = () => {
@@ -124,17 +96,6 @@ app.post('/api/persons', (request, response) => {
   person.save().then(savedPerson => {
     response.json(savedPerson)
   })
-/*
-  const person = {
-    name: body.name,
-    number: body.number,
-    id: generateId(),
-  }
-
-  persons = persons.concat(person)
-
-  response.json(person)
-*/
 })
 
 
