@@ -17,27 +17,27 @@ app.use(express.static('build'))
 
 
 let persons = [
-      { 
-        "name": "Arto Hellas", 
-        "number": "040-123456",
-        "id": 1
-      },
-      { 
-        "name": "Ada Lovelace", 
-        "number": "39-44-5323523",
-        "id": 2
-      },
-      { 
-        "name": "Dan Abramov", 
-        "number": "12-43-234345",
-        "id": 3
-      },
-      { 
-        "name": "Mary Poppendieck", 
-        "number": "39-23-6423122",
-        "id": 4
-      }
-    ]
+  {
+    'name': 'Arto Hellas',
+    'number': '040-123456',
+    'id': 1
+  },
+  {
+    'name': 'Ada Lovelace',
+    'number': '39-44-5323523',
+    'id': 2
+  },
+  {
+    'name': 'Dan Abramov',
+    'number': '12-43-234345',
+    'id': 3
+  },
+  {
+    'name': 'Mary Poppendieck',
+    'number': '39-23-6423122',
+    'id': 4
+  }
+]
 
 app.get('/api/persons', (req, res) => {
   Person.find({}).then(persons => {
@@ -46,8 +46,8 @@ app.get('/api/persons', (req, res) => {
 })
 
 app.get('/info', (req, res) => {
-    let d = new Date()
-    res.send(`Phonebook has info for ${persons.length} people<p>${d}`)
+  let d = new Date()
+  res.send(`Phonebook has info for ${persons.length} people<p>${d}`)
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -65,6 +65,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
     .then(result => {
+      console.log(result)
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -83,18 +84,15 @@ app.post('/api/persons', (request, response, next) => {
   console.log(body)
 
   if (!body.name || !body.number) {
-    return response.status(400).json({ 
-      error: 'name and/or number missing' 
+    return response.status(400).json({
+      error: 'name and/or number missing'
     })
   }
-
-/*
   if (typeof persons.find(person => person.name === body.name) !== 'undefined') {
-    return response.status(400).json({ 
-      error: 'name must be unique' 
+    return response.status(400).json({
+      error: 'name must be unique'
     })
   }
-*/
 
   const person = new Person({
     name: body.name,
@@ -119,11 +117,10 @@ app.use(unknownEndpoint)
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
-  if (error.name === 'CastError' && error.kind == 'ObjectId') {
+  if (error.name === 'CastError' && error.kind === 'ObjectId') {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
-    return response.status(400).send({ error: 'validation error' })
-//    return response.status(400).json({ error: error.message })
+    return response.status(400).json({ error: error.message })
   }
 
   next(error)
