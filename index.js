@@ -4,6 +4,8 @@ npm install express
 npm install --save-dev nodemon
 npm install morgan
 npm install cors
+npm install mongoose
+npm install dotenv
 
 package.json:
   // ...
@@ -16,8 +18,10 @@ package.json:
 npm run dev
 */
 
+require('dotenv').config()
 const express = require('express')
 const app = express()
+const Person = require('./models/person')
 
 app.use(express.json())
 
@@ -54,7 +58,9 @@ let persons = [
     ]
 
 app.get('/api/persons', (req, res) => {
+  Person.find({}).then(persons => {
     res.json(persons)
+  })
 })
 
 app.get('/info', (req, res) => {
@@ -63,6 +69,14 @@ app.get('/info', (req, res) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
+  Person.findById(request.params.id).then(person => {
+    if (person) {
+      response.json(person)
+    } else {
+      response.status(404).end()
+    }
+  })
+/*  
   const id = Number(request.params.id)
   const person = persons.find(person => person.id === id)
 
@@ -71,6 +85,7 @@ app.get('/api/persons/:id', (request, response) => {
   } else {
       response.status(404).end()
   }
+*/
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -101,6 +116,15 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  })
+
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
+/*
   const person = {
     name: body.name,
     number: body.number,
@@ -110,6 +134,7 @@ app.post('/api/persons', (request, response) => {
   persons = persons.concat(person)
 
   response.json(person)
+*/
 })
 
 
